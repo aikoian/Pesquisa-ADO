@@ -1,26 +1,44 @@
+# Importação de bibliotecas
+
 import nltk
 import pandas as pd
+import re
+#----------------------------
 
+# Função para remoção do Nome dos Usuários
 
-nltk.download('punkt')     # -> tokenização
-nltk.download('stopwords') # -> stopwords
-nltk.download('rslp')      # -> stemmer para português
+def remove_mencoes(texto):
+    return re.sub(r'@\w+','', texto)
+#----------------------------
+
+# Download dos recursos]
+
+# nltk.download('punkt')     # -> tokenização
+# nltk.download('stopwords') # -> stopwords
+# nltk.download('rslp')      # -> stemmer para português
+#----------------------------
+
+# Carregando o dataset original
 
 arquivo = 'Dataset.csv'
 df = pd.read_csv(arquivo)
+#----------------------------
 
-print("Colunas do dataset:")
-
-print(df.columns)
-
-print("\n Primeiras linhas: ")
-
-print(df.head())
-
-print("\n Informações do dataset:")
-print(df.info())
+# Filtro de quais colunas vão ser utilizadas -> o comentário + rótulo geral
 
 df_final = df[['text', 'hatespeech_comb']]
+#----------------------------
 
-print(df_final.columns)
-print(df_final.head)
+# Cria uma coluna com o texto limpo (Sem nome dos usuários)
+
+df_final['text_limpo'] = df_final['text'].apply(remove_mencoes)
+#----------------------------
+
+# Visualização das primeiras 10 linhas para comparação
+
+print(df_final[['text','text_limpo']].head(10))
+#----------------------------
+
+
+
+
