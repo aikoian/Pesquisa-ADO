@@ -17,3 +17,5 @@ def remover_stopwords(texto):
 
 df['text'] = df['text'].apply(remover_stopwords)
 print(df.head(10))
+
+df.to_csv("dataset_tratado_2",index = False, encoding='utf-8')
