@@ -5,7 +5,7 @@ import re
 from nltk.corpus import stopwords
 import string
 
-df = pd.read_csv("D:\Pesquisa-ADO\dataset_final_enxuto.csv")
+df = pd.read_csv(r"C:\Users\Lenovo\Desktop\Workspace\estudos\Pesquisa-ADO\dataset_tratado_1.csv")
 
 # print("Informações do dataset: ")
 # print(df.info)

@@ -2,8 +2,8 @@ import nltk
 from nltk.corpus import stopwords
 import re 
 import pandas as pd
-
-df = pd.read_csv("D:\Pesquisa-ADO\dataset_final_enxuto.csv", encoding='utf-8', low_memory=False)
+nltk.download('stopwords')
+df = pd.read_csv(r"C:\Users\Lenovo\Desktop\Workspace\estudos\Pesquisa-ADO\Dataset.csv", encoding='utf-8', low_memory=False)
 
 # Selecionar apenas as duas colunas principais (text + hatespech_comb)
 df = df[['text', 'hatespeech_comb']].copy()
@@ -18,4 +18,4 @@ def remover_stopwords(texto):
 df['text'] = df['text'].apply(remover_stopwords)
 print(df.head(10))
 
-df.to_csv("dataset_tratado_2",index = False, encoding='utf-8')
+df.to_csv("dataset_tratado_1",index = False, encoding='utf-8')
