@@ -4,8 +4,6 @@ import re
 import pandas as pd
 import string
 
-# 
-# 
 # nltk.download('stopwords')
 
 # funcao que remove stopwords
