@@ -10,6 +10,7 @@ df = pd.read_csv(r"C:\Users\Lenovo\Desktop\Workspace\estudos\Pesquisa-ADO\Datase
 # Selecionar apenas as duas colunas principais (text + hatespech_comb)
 df = df[['text', 'hatespeech_comb']].copy()
 
+# essa linha pega todas as stopword portuguesas ("o", "a", "do"...) e transforma elas num set (tipo de variavel mais rapido de fazer buscas)
 stop_words = set(stopwords.words('portuguese'))
 
 # funcao que remove stopwords
@@ -19,7 +20,6 @@ def remover_stopwords(texto):
     return ' '.join(texto_sem_stopwords)
 
 df['text'] = df['text'].apply(remover_stopwords)
-print(df.head(10))
 
 # a partir daqui, esse tratamento está focando em retirar espaços em excesso e pontuação.
 def remover_pontuacao(texto):
@@ -30,4 +30,5 @@ df['text'] = df['text'].astype(str).apply(remover_pontuacao)
 # Remover espaços em excesso
 df['text'] = df['text'].apply(lambda x: " ".join(x.split()))
 
+# df.to_csv é o comando do Pandas para salvar um DataFrame em um arquivo CSV.
 df.to_csv("dataset_tratado_final.csv", index=False, encoding='utf-8')
