@@ -4,6 +4,8 @@ import re
 import pandas as pd
 import string
 
+# 
+# 
 # nltk.download('stopwords')
 
 # funcao que remove stopwords
@@ -17,7 +19,7 @@ def remover_pontuacao(texto):
     return texto.translate(str.maketrans('','',string.punctuation))
 
 # aqui se lê o arquivo do dataset original
-df = pd.read_csv(r"C:\Users\guilb_3cws35i\OneDrive\Documentos\GitHub\Pesquisa-ADO\Dataset_original.csv", encoding='utf-8', low_memory=False)
+df = pd.read_csv(r"C:\Users\guilb_3cws35i\OneDrive\Documentos\GitHub\Pesquisa-ADO\dataset_original.csv", encoding='utf-8', low_memory=False)
 
 # Selecionar apenas as duas colunas principais (text + hatespech_comb)
 df = df[['text', 'hatespeech_comb']].copy()
@@ -38,4 +40,4 @@ df['text'] = df['text'].apply(lambda x: " ".join(x.split()))
 print(df.head(10))
 
 # df.to_csv é o comando do Pandas para salvar um DataFrame em um arquivo CSV.
-df.to_csv("dataset_tratado_final.csv", index=False, encoding='utf-8')
+df.to_csv("dataset_final.csv", index=False, encoding='utf-8')
