@@ -1,7 +1,8 @@
-# Analise de Discurso de odio.
+# Análise de Discurso de ódio.
 Desenvolvimento da pesquisa sobre discurso de ódio.
 
 ---- Limpeza do Dataset de Discurso de Ódio ----
+
 O objetivo deste script é preparar e limpar o dataset para que ele possa ser usado em análises posteriores.
 
 ---- O que o script faz? ----
@@ -35,14 +36,14 @@ O objetivo deste script é preparar e limpar o dataset para que ele possa ser us
 4. O arquivo limpo (dataset_tratado_final.csv) será gerado na pasta do projeto.
 
 ----Estrutura esperada ----
-Entrada( Dataset.csv)
+1. Entrada( Dataset.csv)
 
 | text                    | hatespeech_comb  |
 | ----------------------- | ---------------- |
 | "esse cara é um idiota" | 1                |
 | "bom dia a todos"       | 0                |
 
-Saída( dataset_tratado_final.csv)
+2. Saída( dataset_tratado_final.csv)
 
 | text            | hatespeech_comb  |
 | --------------- | ---------------- |
@@ -50,7 +51,7 @@ Saída( dataset_tratado_final.csv)
 | "bom dia todos" | 0                |
 
 ---- Objetivo ----
-Esse tratamento é um pré-processamento:
+1. Esse tratamento é um pré-processamento:
 - Deixa os dados mais organizados.
 - Evita "ruído" durante o treinamento de modelos.
 - Aumenta a qualidade da análise de discurso de ódio.
