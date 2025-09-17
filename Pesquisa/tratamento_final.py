@@ -17,7 +17,7 @@ def remover_pontuacao(texto):
     return texto.translate(str.maketrans('','',string.punctuation))
 
 # aqui se lê o arquivo do dataset original
-df = pd.read_csv(r"C:\Users\guilb_3cws35i\OneDrive\Documentos\GitHub\Pesquisa-ADO\Dataset.csv", encoding='utf-8', low_memory=False)
+df = pd.read_csv(r"C:\Users\guilb_3cws35i\OneDrive\Documentos\GitHub\Pesquisa-ADO\Dataset_original.csv", encoding='utf-8', low_memory=False)
 
 # Selecionar apenas as duas colunas principais (text + hatespech_comb)
 df = df[['text', 'hatespeech_comb']].copy()
