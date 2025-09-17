@@ -1,4 +1,6 @@
-# An-lise-de-Discurso-de-dio.
+# Analise de Discurso de odio.
 Desenvolvimento da pesquisa sobre discurso de ódio.
 
-<!-- Adicionar uma descrição detalhada sobre o tratamento dos dados. -->
+oi bosta
+
+
