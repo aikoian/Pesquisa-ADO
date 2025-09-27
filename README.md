@@ -12,18 +12,22 @@ O objetivo deste script é preparar e limpar o dataset para que ele possa ser us
  - text (texto original).
  - hatespeech_comb (a classificação - se é reconhecido como discurso de ódio ou não).
 
-2. Remove stopwords (palavras comuns que não ajudam na classificação)
+2. Remove padrões de URL e usernames do texto.
+ - elimina todo texto associado a (http, https, www) e @
+ - Isso deixa os textos mais limpos de ánalise.
+
+3. Remove stopwords (palavras comuns que não ajudam na classificação)
  - Usamos as stopwords do NLTK em portugues (palavras como "de", "a","o", "para").
  - Isso ajuda a focar apenas nas palavras que realmente carregam significado.
 
-3. Remove pontuação e símbolos desnecessários
+4. Remove pontuação e símbolos desnecessários
  - Tiramos vírgulas, pontos, pontos de exclamação, interrogações etc.
  - Isso deixa os textos mais limpos de ánalise.
 
-4. Normaliza os espaços
+5. Normaliza os espaços
  - Caso existam espaços duplos ou em excesso, eles são corrigidos.
 
-5. Exporta o dataset tratado
+6. Exporta o dataset tratado
  - O arquivo final é salvo como dataset_tratado_final.csv, pronto para ser usado em modelos.
 
 ---- Como usar ----
