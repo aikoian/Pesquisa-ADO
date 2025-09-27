@@ -13,7 +13,7 @@ O objetivo deste script é preparar e limpar o dataset para que ele possa ser us
  - hatespeech_comb (a classificação - se é reconhecido como discurso de ódio ou não).
 
 2. Remove padrões de URL e usernames do texto.
- - elimina todo texto associado a (http, https, www) e @
+ - elimina todo texto associado a (http, https, www) e @.
  - Isso deixa os textos mais limpos de ánalise.
 
 3. Remove stopwords (palavras comuns que não ajudam na classificação)
