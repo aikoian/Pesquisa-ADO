@@ -3,8 +3,8 @@ from nltk.corpus import stopwords
 import re
 import pandas as pd
 import string
-    
-nltk.download('stopwords')
+
+# nltk.download('stopwords') # fazer download apenas uma vez.
 
 # --- Funções de Limpeza ---
 
@@ -34,7 +34,7 @@ def remover_pontuacao(texto):
 # --- Início do Script Principal ---
 
 # Lê o arquivo do dataset original (texto bruto)
-df = pd.read_csv(r"C:\Users\guilb_3cws35i\OneDrive\Documentos\GitHub\Pesquisa-ADO\dataset_original.csv", encoding='utf-8', low_memory=False)
+df = pd.read_csv(r"C:\Users\aikoi\OneDrive\Área de Trabalho\Arquivos\Estudos\Pesquisa ADO testes\dataset_original.csv")
 
 # Selecionar apenas as duas colunas principais (text + hatespech_comb)
 df = df[['text', 'hatespeech_comb']].copy()
@@ -45,21 +45,42 @@ stop_words = set(stopwords.words('portuguese'))
 
 # --- FLUXO DE TRATAMENTO ---
 
+print("""
+      ---DATASET ANTES DO PRÉ-PROCESSAMENTO---
+      """)
+print(df.head(10))
+print()
+
 # PASSO 1: Remove URLs e usernames do texto original (ainda com pontuação)
+print("PASSO 1: Remove URLs e usernames do texto original (ainda com pontuação)")
+print()
 df['text'] = df['text'].astype(str).apply(remover_urls_e_usernames)
+print(df.head(10))
+print()
 
 # PASSO 2: Agora sim, remove o resto da pontuação
+print("# PASSO 2: Agora sim, remove o resto da pontuação")
+print()
 df['text'] = df['text'].apply(remover_pontuacao)
+print(df.head(10))
+print()
 
 # PASSO 3: Remove stopwords
+print("PASSO 3: Remove stopwords")
+print()
 df['text'] = df['text'].apply(remover_stopwords)
+print(df.head(10))
+print()
 
 # PASSO 4: Remove espaços em excesso
-print("Passo 4: Limpando espaços extras...")
+print("PASSO 4: Remove espaços em excesso")
+print()
 df['text'] = df['text'].apply(lambda x: " ".join(x.split()))
+print()
 
 
 # Testa no terminal as 10 primeiras linhas do dataset tratado
+print("PARTE FINAL DO PRÉ-PROCESSAMENTO")
 print(df.head(10))
 
 # Salva o DataFrame no arquivo final
