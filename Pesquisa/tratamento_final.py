@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 import re
 import pandas as pd
 import string
-
+    
 nltk.download('stopwords')
 
 # --- Funções de Limpeza ---
