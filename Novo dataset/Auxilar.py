@@ -2,7 +2,7 @@ import pandas as pd
 
 # --- Passo 1: Carregar o dataset OLiD-BR ---
 try:
-    df_olid = pd.read_csv("train.csv")
+    df_olid = pd.read_csv(r"D:\Pesquisa-ADO\Novo dataset\train.csv")
     print("Dataset OLiD-BR (train.csv) carregado com sucesso!")
 except FileNotFoundError as e:
     print(f"Erro: Arquivo train.csv não encontrado.\nDetalhe: {e}")
