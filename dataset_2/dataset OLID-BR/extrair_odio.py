@@ -1,10 +1,10 @@
 import pandas as pd
 
 # Defina o nome do arquivo de entrada que você já criou
-arquivo_de_entrada = "D:\Pesquisa-ADO\Pesquisa\dataset_final.csv"
+arquivo_de_entrada = ""
 
 # Defina o nome do novo arquivo que será gerado
-arquivo_de_saida = "hate_speech_only.csv"
+arquivo_de_saida = ""
 
 try:
     # 1. Carrega o seu dataset completo e já processado
@@ -13,7 +13,7 @@ try:
 
     # 2. Filtra o DataFrame, mantendo apenas as linhas onde 'is_hate_speech' é igual a 1
     print("Filtrando para manter apenas os casos de discurso de ódio (is_hate_speech == 1)...")
-    df_apenas_odio = df_completo[df_completo['hatespeech_comb'] == 1].copy()
+    df_apenas_odio = df_completo[df_completo[''] == 1].copy()
 
     # 3. Verifica se foram encontrados exemplos
     if df_apenas_odio.empty:
