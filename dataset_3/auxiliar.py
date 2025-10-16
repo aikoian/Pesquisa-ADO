@@ -35,7 +35,7 @@ try:
     # Mantém apenas as linhas onde QUALQUER uma das colunas de ódio seja igual a 2.0
     # Isso garante que estamos pegando apenas os casos de alta confiança de discurso de ódio.
     print("Filtrando para manter apenas os casos de ódio explícito (valor == 2.0)...")
-    condicao_odio_explicito = (df[colunas_de_odio] == 2.0).any(axis=1)
+    condicao_odio_explicito = (df[colunas_de_odio] == 1.0).any(axis=1)
     df_filtrado = df[condicao_odio_explicito]
 
     # 3. SELEÇÃO DE COLUNAS:
