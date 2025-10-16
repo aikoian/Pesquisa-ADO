@@ -60,3 +60,8 @@ O objetivo deste script é preparar e limpar o dataset para que ele possa ser us
 - Evita "ruído" durante o treinamento de modelos.
 - Aumenta a qualidade da análise de discurso de ódio.
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
