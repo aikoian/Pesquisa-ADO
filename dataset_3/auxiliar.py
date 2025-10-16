@@ -1,60 +1,84 @@
 import pandas as pd
+import re
+import string
+import nltk
+from nltk.corpus import stopwords
 
-# --- CONFIGURAÇÃO ---
-# Coloque aqui o nome do arquivo CSV completo do ToLD-Br
-arquivo_base_toldbr = r"C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_3\ToLD-BR.csv" 
+# --- CONFIGURAÇÃO INICIAL (Baseado no seu 'tratamento.py') ---
 
-# Nome do arquivo que será gerado com os dados filtrados
-arquivo_final_para_analise = "toldbr_casos_relevantes.csv"
-
-# Colunas que queremos manter no arquivo final
-colunas_de_interesse = [
-    'text',
-    'homophobia',
-    'racism',
-    'misogyny',
-    'xenophobia'
-]
-
-# Colunas que usaremos para filtrar os casos de ódio explícito
-colunas_de_odio = [
-    'homophobia',
-    'racism',
-    'misogyny',
-    'xenophobia'
-]
-
-
-# --- EXECUÇÃO DO SCRIPT ---
+# Garante que o pacote de stopwords do NLTK está baixado
 try:
-    # 1. Carrega o dataset completo
-    print(f"Carregando o arquivo '{arquivo_base_toldbr}'...")
-    df = pd.read_csv(arquivo_base_toldbr)
+    stopwords.words('portuguese')
+except LookupError:
+    print("Baixando a lista de stopwords do NLTK (necessário apenas na primeira vez)...")
+    nltk.download('stopwords')
 
-    # 2. FILTRAGEM DE LINHAS: 
-    # Mantém apenas as linhas onde QUALQUER uma das colunas de ódio seja igual a 2.0
-    # Isso garante que estamos pegando apenas os casos de alta confiança de discurso de ódio.
-    print("Filtrando para manter apenas os casos de ódio explícito (valor == 2.0)...")
-    condicao_odio_explicito = (df[colunas_de_odio] == 1.0).any(axis=1)
-    df_filtrado = df[condicao_odio_explicito]
+# Cria o conjunto de stopwords em português para maior eficiência
+stop_words_pt = set(stopwords.words('portuguese'))
 
-    # 3. SELEÇÃO DE COLUNAS:
-    # Cria o dataframe final apenas com as colunas que você quer visualizar.
-    df_final = df_filtrado[colunas_de_interesse]
 
-    # 4. Salva o resultado no novo arquivo CSV
-    df_final.to_csv(arquivo_final_para_analise, index=False, encoding='utf-8')
+# --- FUNÇÕES DE LIMPEZA (Exatamente como no seu arquivo 'tratamento.py') ---
+
+def remover_urls_e_usernames(texto):
+    """Remove padrões de URL e usernames do texto."""
+    # Adicionado str(texto) para garantir que a função não falhe com dados não-textuais
+    padrao = re.compile(r'@\w+|https?://\S+|www\.\S+')
+    return padrao.sub(r'', str(texto))
+
+def remover_pontuacao(texto):
+    """Remove toda a pontuação do texto."""
+    return str(texto).translate(str.maketrans('', '', string.punctuation))
+
+def remover_stopwords(texto):
+    """Converte para minúsculas e remove as stopwords."""
+    texto_lower = str(texto).lower()
+    tokens = texto_lower.split()
+    texto_sem_stopwords = [palavra for palavra in tokens if palavra not in stop_words_pt]
+    return ' '.join(texto_sem_stopwords)
+
+
+# --- EXECUÇÃO PRINCIPAL ---
+
+# Nomes dos arquivos de entrada e saída
+arquivo_bruto = r"C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_3\told_apenas_hate_2.0_bruto.csv"
+arquivo_tratado_final = "told_apenas_hate_2.0_tratado.csv"
+
+try:
+    # 1. Carrega o dataset bruto que você gerou
+    print(f"Carregando o arquivo '{arquivo_bruto}'...")
+    df_bruto = pd.read_csv(arquivo_bruto)
+    print("Arquivo carregado com sucesso.")
+    print("\nAmostra dos dados brutos:")
+    print(df_bruto.head().to_string())
+
+    # Cria uma cópia para aplicar o tratamento
+    df_tratado = df_bruto.copy()
+
+    # 2. Aplica o fluxo de tratamento na coluna 'text'
+    print("\n--- INICIANDO PROCESSO DE LIMPEZA ---")
+
+    print("\n1. Removendo URLs e usernames...")
+    df_tratado['text'] = df_tratado['text'].apply(remover_urls_e_usernames)
+
+    print("2. Removendo pontuação...")
+    df_tratado['text'] = df_tratado['text'].apply(remover_pontuacao)
+
+    print("3. Removendo stopwords e convertendo para minúsculas...")
+    df_tratado['text'] = df_tratado['text'].apply(remover_stopwords)
+
+    print("4. Removendo espaços em excesso...")
+    df_tratado['text'] = df_tratado['text'].apply(lambda x: " ".join(x.split()))
+
+    # 3. Salva o resultado no novo arquivo CSV
+    df_tratado.to_csv(arquivo_tratado_final, index=False, encoding='utf-8')
 
     print("\n--- SUCESSO! ---")
-    print(f"Arquivo '{arquivo_final_para_analise}' foi criado.")
-    print(f"Ele contém {len(df_final)} casos de alta confiança para sua análise manual.")
-    print("\nAmostra do arquivo gerado:")
-    print(df_final.head().to_string())
+    print(f"Arquivo '{arquivo_tratado_final}' foi criado com o texto tratado.")
+    print("Agora você pode avaliar a precisão do conteúdo limpo.")
+    print("\nAmostra do arquivo final tratado:")
+    print(df_tratado.head().to_string())
 
 
 except FileNotFoundError:
-    print(f"\nERRO: O arquivo '{arquivo_base_toldbr}' não foi encontrado.")
-    print("Por favor, renomeie o seu arquivo CSV do ToLD-Br para o nome definido na variável 'arquivo_base_toldbr' ou altere a variável no script.")
-except KeyError:
-    print("\nERRO: Uma ou mais colunas não foram encontradas no arquivo.")
-    print("Por favor, verifique se os nomes das colunas no script correspondem exatamente aos do seu CSV.")
+    print(f"\nERRO: O arquivo '{arquivo_bruto}' não foi encontrado.")
+    print("Por favor, certifique-se de que ele está na mesma pasta que este script.")
