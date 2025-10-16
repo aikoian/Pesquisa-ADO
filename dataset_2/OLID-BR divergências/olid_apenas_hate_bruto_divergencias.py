@@ -2,12 +2,12 @@
 # ">americas lotado de caboclas gostosas partindo das pálidas até as mais escuras estilo pocahontas>das mais qt's até as mais cavalas >floquinho de neve quer porque quer se enfiar em uma reserva cheia de índio armado caçando ele com hilux pra sujar a genética de um povo que descende apenas de 70 pessoas e tem separação do resto da humanidade de mais de 24k de anosé muita síndrome de floquinho de neve, puta merda.",False,True,True,False,False
 # "USER pode achar seu principe encantado,mas sempre vai acabar: Gorda,feia,virgem,cheia de poster de crepúsculo a parede!!",False,True,False,False,False
 # O povo burro é esse do Brasil!!! Invés de ficar perdendo tempo discutindo quem tá certo ou errado tínhamos que focar na pandemia!!! Esse povo da ESQUERDA E DIREITA não entende que esse não é momento pra ficar brigando e fazendo manifestações !! Depois pega a merda do vírus vai dar trabalho pra um pai ou mãe que não pode ir pra casa direito pois tem que ficar trabalhando dobrado em hospitais!! Vamos respeitar a quarentena!!parem de comer capim um pouco!!,False,False,True,False,False
-# "USER é romântico pra poha USER USER com o mendigo. Uma pele macia, quente, uma voz doce e envolvente. Caray o maluco é USER USER",False,True,False,False,False
-# "Uma palhaçada isUSER, USER no brasil existe isUSER... como pode alguem que pato os pais ou os filhos poder sair no dia dos pais! Quanta hipocrisia viu.",False,False,True,False,False
-# "USER USER mas eu não falei dele, falo dos doentes USERue saem de casa p apoiar presidente, tem USER lembrar USER ñ tem USER babar ovo de presidente, ja USER ele é USERue tem USER ser funcionário da nação",False,False,True,False,False
-# USER to louca p ver ele em pachinko por isso vi q o personagem eh meio canalha ne veremos,False,True,False,False,False
-# esse nate merece mil tiros no meio do cu dele fdp fdp fdpppp,False,True,False,False,False
-# JÁ USER USER USER USER! NÃO TEM UM NEGROOOOOO!!!!! USER,True,False,False,False,False
+#! "USER é romântico pra poha USER USER com o mendigo. Uma pele macia, quente, uma voz doce e envolvente. Caray o maluco é USER USER",False,True,False,False,False
+#! "Uma palhaçada isUSER, USER no brasil existe isUSER... como pode alguem que pato os pais ou os filhos poder sair no dia dos pais! Quanta hipocrisia viu.",False,False,True,False,False
+#! "USER USER mas eu não falei dele, falo dos doentes USERue saem de casa p apoiar presidente, tem USER lembrar USER ñ tem USER babar ovo de presidente, ja USER ele é USERue tem USER ser funcionário da nação",False,False,True,False,False
+#! USER to louca p ver ele em pachinko por isso vi q o personagem eh meio canalha ne veremos,False,True,False,False,False
+#! esse nate merece mil tiros no meio do cu dele fdp fdp fdpppp,False,True,False,False,False
+#! JÁ USER USER USER USER! NÃO TEM UM NEGROOOOOO!!!!! USER,True,False,False,False,False
 # "USER Isso mesmo. Chamem negros de neguim, mandem todos tomar no cu, digam que só tem puta, e não esqueçam de falar das mocreias. Ah e tem que chamar todo mundo de analfabeto funcional com toxoplasmose. A não ser os que acreditam em terra plana e pezao.",True,True,False,True,False
 # "USER não entendo , pq USER USER fica com medo dela ? USER tem homem nessa porra não .......",False,True,False,False,False
 # Homem é um bicho estranho ao mesmo tmp ridículo 🤣,False,True,False,False,False
