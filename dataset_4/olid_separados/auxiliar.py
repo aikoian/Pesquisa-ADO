@@ -7,10 +7,10 @@ import sys
 N_AMOSTRAS = 607
 
 # Arquivo de entrada (o grande)
-ARQUIVO_DE_ENTRADA = r"C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_4\olid_separados\casos_ataque_individual.csv"
+ARQUIVO_DE_ENTRADA = r"C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_4\olid_separados\casos_nenhum.csv"
 
 # Arquivo de saída (a amostra para você revisar)
-ARQUIVO_DE_SAIDA = "amostra_ataque_individual_para_revisao.csv"
+ARQUIVO_DE_SAIDA = "amostra_de_607_[0,0]_para_revisao.csv"
 
 # Estado aleatório para garantir que a amostragem seja reprodutível
 RANDOM_STATE = 42
