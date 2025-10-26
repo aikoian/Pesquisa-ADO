@@ -83,4 +83,3 @@ try:
 
 except FileNotFoundError:
     print(f"\nERRO: O arquivo '{arquivo_bruto}' não foi encontrado.")
-    
