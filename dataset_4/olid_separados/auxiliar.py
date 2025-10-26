@@ -1,51 +1,43 @@
+
 import pandas as pd
+import re # Para lidar com as quebras de linha
 
-# 1. Carregar o dataset ToLD-BR
-file_path_told = r'C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_3\ToLD-BR.csv'
+# Nome do arquivo de entrada (o que você me enviou)
+input_file = r'C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_4\olid_separados\amostra_607_casos_[0,0]_.csv'
+
+# Nome do arquivo de saída (o arquivo corrigido)
+output_file = 'amostra_607_casos_00_formatada.csv'
+
 try:
-    df_told = pd.read_csv(file_path_told)
+    # Carregar o arquivo CSV. 
+    # header=None porque ele não tem cabeçalho.
+    # Damos nomes às colunas para facilitar.
+    df = pd.read_csv(input_file, header=None, names=['text', 'discurso_de_odio', 'ataque_individual'])
+
+    # Garantir que a coluna de texto seja tratada como string
+    df['text'] = df['text'].astype(str)
+
+    # --- Ação de Limpeza ---
+    # 1. Substituir todas as formas de quebra de linha (\r\n, \n, \r) 
+    #    por um único espaço em branco.
+    #    regex=True permite encontrar todos os tipos de quebra de linha.
+    df['text'] = df['text'].str.replace(r'\r\n|\n|\r', ' ', regex=True)
+    
+    # 2. Remover quaisquer espaços em branco extras no início ou no fim
+    #    que possam ter resultado da substituição.
+    df['text'] = df['text'].str.strip()
+
+    # Salvar o DataFrame limpo em um novo arquivo CSV
+    # header=False e index=False para manter o formato "texto",0,0
+    # encoding='utf-8-sig' ajuda a evitar problemas com acentos.
+    df.to_csv(output_file, header=False, index=False, encoding='utf-8-sig')
+
+    print(f"Script executado com sucesso!")
+    print(f"Arquivo de entrada: '{input_file}'")
+    print(f"Arquivo formatado gerado: '{output_file}'")
+
 except FileNotFoundError:
-    print(f"Erro: Arquivo '{file_path_told}' não encontrado.")
-    print("Por favor, coloque este script no mesmo diretório do 'ToLD-BR.csv'.")
-    exit()
-
-# 2. Definir a lógica [0,0] para o ToLD-BR
-# Um caso [0,0] (neutro) é aquele onde *todas* as colunas de classificação
-# são 0.0.
-annotation_cols = ['homophobia', 'obscene', 'insult', 'racism', 'misogyny', 'xenophobia']
-
-# 3. Filtrar os casos [0,0]
-# Somamos os valores de todas as colunas de anotação.
-# Se a soma for 0.0, significa que todas são 0.0.
-df_00_told = df_told[df_told[annotation_cols].sum(axis=1) == 0.0].copy()
-
-# 4. Verificar a contagem
-total_00_told = len(df_00_told)
-n_amostras = 607
-
-if total_00_told >= n_amostras:
-    print(f"Total de casos 'limpos' [0,0] encontrados: {total_00_told}")
-    
-    # 5. Extrair 607 amostras aleatórias
-    # random_state=42 garante que a amostra seja sempre a mesma
-    df_00_sample = df_00_told.sample(n=n_amostras, random_state=42)
-    
-    # 6. Criar o DataFrame final no formato solicitado
-    df_final = pd.DataFrame()
-    df_final['text'] = df_00_sample['text']
-    df_final['discurso_de_odio'] = 0
-    df_final['ataque_individual'] = 0
-    
-    # 7. Salvar no arquivo CSV
-    output_filename = 'amostra_607_casos_00_ToLD-BR.csv'
-    
-    # Salvar sem cabeçalho (header=False) e sem índice (index=False)
-    # encoding='utf-8-sig' é recomendado para CSVs com acentos
-    df_final.to_csv(output_filename, header=False, index=False, encoding='utf-8-sig')
-    
-    print(f"\nArquivo '{output_filename}' gerado com sucesso!")
-    print(f"Total de linhas no arquivo: {len(df_final)}")
-
-else:
-    print(f"\nErro: Não foi possível gerar a amostra.")
-    print(f"O ToLD-BR possui apenas {total_00_told} casos 'limpos', mas precisávamos de {n_amostras}.")
+    print(f"Erro: Arquivo de entrada '{input_file}' não encontrado.")
+    print("Por favor, certifique-se de que este script está no mesmo diretório que o arquivo CSV.")
+except Exception as e:
+    print(f"Ocorreu um erro durante o processamento: {e}")
