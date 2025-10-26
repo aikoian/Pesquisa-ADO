@@ -1,52 +1,51 @@
 import pandas as pd
-import sys
 
-# --- Configuração ---
-# O número de amostras para igualar à sua classe de ódio a grupo [1,0]
-# com base no arquivo casos_[1,0]_gerado.csv
-N_AMOSTRAS = 607
-
-# Arquivo de entrada (o grande)
-ARQUIVO_DE_ENTRADA = r"C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_4\olid_separados\casos_nenhum.csv"
-
-# Arquivo de saída (a amostra para você revisar)
-ARQUIVO_DE_SAIDA = "amostra_de_607_[0,0]_para_revisao.csv"
-
-# Estado aleatório para garantir que a amostragem seja reprodutível
-RANDOM_STATE = 42
-
+# 1. Carregar o dataset ToLD-BR
+file_path_told = r'C:\Users\aiko\Documents\GitHub\Pesquisa-ADO\dataset_3\ToLD-BR.csv'
 try:
-    # 1. Carregar o arquivo de ataque individual
-    print(f"Carregando o arquivo completo '{ARQUIVO_DE_ENTRADA}'...")
-    df = pd.read_csv(ARQUIVO_DE_ENTRADA)
-    total_linhas_entrada = len(df)
-    print(f"Arquivo carregado com sucesso. Total de {total_linhas_entrada} linhas.")
-
-    # 2. Verificar se temos linhas suficientes
-    if total_linhas_entrada == 0:
-        print("ERRO: O arquivo de entrada está vazio. Não é possível gerar amostra.", file=sys.stderr)
-        sys.exit()
-    elif total_linhas_entrada < N_AMOSTRAS:
-        print(f"AVISO: O arquivo de entrada tem apenas {total_linhas_entrada} linhas, que é menos do que as {N_AMOSTRAS} solicitadas.")
-        print("O arquivo de amostra conterá todas as linhas disponíveis.")
-        n_amostra_real = total_linhas_entrada
-    else:
-        n_amostra_real = N_AMOSTRAS
-        print(f"Selecionando uma amostra aleatória de {n_amostra_real} linhas...")
-
-    # 3. Selecionar a amostra aleatória
-    # replace=False garante que não teremos linhas duplicadas na amostra
-    df_amostra = df.sample(n=n_amostra_real, random_state=RANDOM_STATE, replace=False)
-
-    # 4. Salvar a amostra em um novo arquivo CSV
-    df_amostra.to_csv(ARQUIVO_DE_SAIDA, index=False, encoding='utf-8')
-
-    print(f"\n--- SUCESSO! ---")
-    print(f"Arquivo '{ARQUIVO_DE_SAIDA}' foi salvo na sua pasta.")
-    print(f"Este arquivo contém {len(df_amostra)} linhas para sua curadoria manual.")
-
+    df_told = pd.read_csv(file_path_told)
 except FileNotFoundError:
-    print(f"ERRO: O arquivo '{ARQUIVO_DE_ENTRADA}' não foi encontrado.", file=sys.stderr)
-    print("Por favor, certifique-se que o arquivo está na mesma pasta do script.")
-except Exception as e:
-    print(f"Um erro inesperado ocorreu: {e}", file=sys.stderr)
+    print(f"Erro: Arquivo '{file_path_told}' não encontrado.")
+    print("Por favor, coloque este script no mesmo diretório do 'ToLD-BR.csv'.")
+    exit()
+
+# 2. Definir a lógica [0,0] para o ToLD-BR
+# Um caso [0,0] (neutro) é aquele onde *todas* as colunas de classificação
+# são 0.0.
+annotation_cols = ['homophobia', 'obscene', 'insult', 'racism', 'misogyny', 'xenophobia']
+
+# 3. Filtrar os casos [0,0]
+# Somamos os valores de todas as colunas de anotação.
+# Se a soma for 0.0, significa que todas são 0.0.
+df_00_told = df_told[df_told[annotation_cols].sum(axis=1) == 0.0].copy()
+
+# 4. Verificar a contagem
+total_00_told = len(df_00_told)
+n_amostras = 607
+
+if total_00_told >= n_amostras:
+    print(f"Total de casos 'limpos' [0,0] encontrados: {total_00_told}")
+    
+    # 5. Extrair 607 amostras aleatórias
+    # random_state=42 garante que a amostra seja sempre a mesma
+    df_00_sample = df_00_told.sample(n=n_amostras, random_state=42)
+    
+    # 6. Criar o DataFrame final no formato solicitado
+    df_final = pd.DataFrame()
+    df_final['text'] = df_00_sample['text']
+    df_final['discurso_de_odio'] = 0
+    df_final['ataque_individual'] = 0
+    
+    # 7. Salvar no arquivo CSV
+    output_filename = 'amostra_607_casos_00_ToLD-BR.csv'
+    
+    # Salvar sem cabeçalho (header=False) e sem índice (index=False)
+    # encoding='utf-8-sig' é recomendado para CSVs com acentos
+    df_final.to_csv(output_filename, header=False, index=False, encoding='utf-8-sig')
+    
+    print(f"\nArquivo '{output_filename}' gerado com sucesso!")
+    print(f"Total de linhas no arquivo: {len(df_final)}")
+
+else:
+    print(f"\nErro: Não foi possível gerar a amostra.")
+    print(f"O ToLD-BR possui apenas {total_00_told} casos 'limpos', mas precisávamos de {n_amostras}.")
