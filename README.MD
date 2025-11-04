@@ -40,3 +40,4 @@ Para garantir um dataset de alta qualidade e autenticidade, adotamos uma metodol
 -   [ ] Redação do Artigo Científico (Em Andamento)
 
 ## 4. Estrutura do Repositório (Provisório)
+/ │ ├── Dataset_criado/ │ ├── dataset_gerado/ │ │ ├── dataset_formatado_bruto.csv (O dataset original) │ │ └── dataset_formatado_tratado.csv (O dataset pré-processado) │ │ │ ├── olid_gerados_[0,0]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[0,1]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[1,0]/ (Amostras-fonte usadas para a classe) │ └── olid_gerados_[1,1]/ (Amostras-fonte usadas para a classe) │ ├── scripts/ (Scripts de coleta, processamento, etc.) └── README.md (Este arquivo)
