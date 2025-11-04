@@ -40,4 +40,62 @@ Para garantir um dataset de alta qualidade e autenticidade, adotamos uma metodol
 -   [ ] Redação do Artigo Científico (Em Andamento)
 
 ## 4. Estrutura do Repositório (Provisório)
-/ │ ├── Dataset_criado/ │ ├── dataset_gerado/ │ │ ├── dataset_formatado_bruto.csv (O dataset original) │ │ └── dataset_formatado_tratado.csv (O dataset pré-processado) │ │ │ ├── olid_gerados_[0,0]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[0,1]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[1,0]/ (Amostras-fonte usadas para a classe) │ └── olid_gerados_[1,1]/ (Amostras-fonte usadas para a classe) │ ├── scripts/ (Scripts de coleta, processamento, etc.) └── README.md (Este arquivo)
+```/│ ├── Dataset_criado/ │ ├── dataset_gerado/ │ │ ├── dataset_formatado_bruto.csv (O dataset original) │ │ └── dataset_formatado_tratado.csv (O dataset pré-processado) │ │ │ ├── olid_gerados_[0,0]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[0,1]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[1,0]/ (Amostras-fonte usadas para a classe) │ └── olid_gerados_[1,1]/ (Amostras-fonte usadas para a classe) │ ├── scripts/ (Scripts de coleta, processamento, etc.) └── README.md (Este arquivo)```
+
+
+## 5. Licença e Atribuição
+
+### Licença do Dataset
+
+O dataset (`/Dataset_criado/dataset_gerado/`) contido neste repositório é um **trabalho derivado** que incorpora materiais dos datasets ToLD-BR e OLID-BR.
+
+Devido à licença "CompartilhaIgual" (SA) do ToLD-BR, este dataset é distribuído sob a mesma licença:
+**[Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)**.
+
+### Licença do Código-Fonte
+
+O código-fonte (scripts em Python) neste repositório é distribuído sob a **Licença MIT** (a menos que indicado de outra forma).
+
+### Citação (Obrigatório)
+
+Se você utilizar este dataset em seu trabalho, por favor, cite nosso artigo (ainda a ser publicado) e os trabalhos originais que formaram sua base.
+
+**Nosso Trabalho (Placeholder):**
+```bibtex
+@misc{seu_projeto_2025,
+  author    = {[Aiko Ian], [Guilherme Leite], [Carol Medeiros], [Augusto Ferrer]},
+  title     = {[Título do seu Artigo/Dataset, ex: Um Dataset Granular para Detecção de Ódio e Ofensa em Português]},
+  year      = {2025},
+  publisher = {GitHub},
+  journal   = {GitHub repository},
+  howpublished = {\url{[https://github.com/guilhermelbr/Pesquisa-ADO](https://github.com/guilhermelbr/Pesquisa-ADO)}}
+
+
+## Datasets Originais (Base deste trabalho):
+
+@inproceedings{leite-etal-2020-toxic,
+    title = "{T}oxic {L}anguage {D}etection in {S}ocial {M}edia for {B}razilian {P}ortuguese: {N}ew {D}ataset and {M}ultilingual {A}nalysis",
+    author = "Leite, Jo{\~a}o Augusto  and
+      Silva, Diego  and
+      Bontcheva, Kalina  and
+      Scarton, Carolina",
+    booktitle = "Proceedings of the 1st Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics and the 10th International Joint Conference on Natural Language Processing",
+    month = dec,
+    year = "2020",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "[https://aclanthology.org/2020.aacl-main.91](https://aclanthology.org/2020.aacl-main.91)",
+    pages = "914--924",
+
+
+@article{trajano-etal-2023-olidbr,
+    title = "{OLID-BR}: {O}ffensive {L}anguage {I}dentification {D}ataset for {B}razilian {P}ortuguese",
+    author = "Trajano, Douglas  and
+      Bordini, Rafael H.  and
+      Vieira, Renata",
+    journal = {Language Resources and Evaluation},
+    year = "2023",
+    month = may,
+    doi = {10.1007/s10579-023-09657-0},
+    url = "[https://doi.org/10.1007/s10579-023-09657-0](https://doi.org/10.1007/s10579-023-09657-0)"
+}
