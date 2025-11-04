@@ -68,11 +68,11 @@ Se você utilizar este dataset em seu trabalho, por favor, cite nosso artigo (ai
   year      = {2025},
   publisher = {GitHub},
   journal   = {GitHub repository},
-  howpublished = {\url{[https://github.com/guilhermelbr/Pesquisa-ADO](https://github.com/guilhermelbr/Pesquisa-ADO)}}
-
+  howpublished = {\url{[https://github.com/guilhermelbr/Pesquisa-ADO](https://github.com/guilhermelbr/Pesquisa-ADO)}}}
+```
 
 ## Datasets Originais (Base deste trabalho):
-
+```bibtex
 @inproceedings{leite-etal-2020-toxic,
     title = "{T}oxic {L}anguage {D}etection in {S}ocial {M}edia for {B}razilian {P}ortuguese: {N}ew {D}ataset and {M}ultilingual {A}nalysis",
     author = "Leite, Jo{\~a}o Augusto  and
@@ -99,3 +99,4 @@ Se você utilizar este dataset em seu trabalho, por favor, cite nosso artigo (ai
     doi = {10.1007/s10579-023-09657-0},
     url = "[https://doi.org/10.1007/s10579-023-09657-0](https://doi.org/10.1007/s10579-023-09657-0)"
 }
+```
