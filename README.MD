@@ -1,46 +1,63 @@
-# [Nome do Projeto] - Análise de Discurso de Ódio com LLMs
+```markdown
+# Detecção de Discurso de Ódio em Português: Uma Abordagem Universalista e Granular
 
-[![Status do Projeto](https://img.shields.io/badge/Status-Em_Andamento-blue.svg)](https://shields.io/)
-[![License: CC BY-SA 4.0](https://img.shields.io/badge/Dataset_License-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+![Status do Projeto](https://img.shields.io/badge/Status-Em_Andamento-blue.svg)
+![License: CC BY-SA 4.0](https://img.shields.io/badge/Dataset_License-CC_BY--SA_4.0-lightgrey.svg)
 
-Este repositório documenta um projeto de extensão focado na análise e detecção de discurso de ódio nas redes sociais (com foco inicial no Reddit) para o português brasileiro, utilizando Modelos de Linguagem de Grande Porte (LLMs).
+Este repositório documenta uma pesquisa de extensão dedicada à análise, detecção e classificação de toxicidade em redes sociais, com foco inicial no português brasileiro. O projeto introduz uma mudança de paradigma ao adotar uma **Abordagem Universalista** e o **Princípio da Prioridade do Alvo**, permitindo uma distinção clara entre conflitos interpessoais (cyberbullying) e ódio coletivo.
 
-O principal artefato deste projeto é um **novo dataset de 2.428 amostras**, criado para permitir uma classificação mais granular de toxicidade, diferenciando ataques individuais de discurso de ódio direcionado a grupos.
+## 1. Fundamentação Teórica e Inovações
 
-## 1. O Dataset: Motivação e Taxonomia
+O diferencial deste projeto reside na superação das limitações conceituais de datasets binários tradicionais através de dois pilares:
 
-Datasets de referência para o português, como o **ToLD-BR** e o **OLID-BR**, são fundamentais, mas frequentemente agrupam diferentes tipos de toxicidade (ofensa e ódio) em um único rótulo. Isso pode ser uma limitação ao treinar modelos que precisam de uma compreensão mais precisa e contextual.
+### 1.1. Abordagem Universalista (*Universalist Approach*)
+Diferente da abordagem restrita que foca exclusivamente em grupos protegidos ou minorias, este projeto assume que a hostilidade coletiva deve ser identificada por sua **estrutura sintática e pragmática**.
+* **Definição**: Discurso de Ódio é qualquer manifestação que generalize, desumanize ou incite violência contra **qualquer grupo social** (ex: policiais, políticos, grupos majoritários), não apenas grupos historicamente vulneráveis.
+* **Justificativa**: Um modelo robusto deve aprender o padrão de "generalização odiosa" para evitar vieses e garantir uma moderação equânime.
 
-Para resolver essa lacuna, propomos uma taxonomia multi-rótulo de 4 classes que desambigua **Ataques Individuais** de **Discurso de Ódio (Ataques a Grupos)**.
+### 1.2. Princípio da Prioridade do Alvo (*Target Priority Principle*)
+Para resolver ambiguidades onde termos de ódio são usados em brigas pessoais, aplicamos a prioridade do alvo:
+* **Ataque Individual**: Quando o enunciado visa atingir um sujeito específico (ex: *"Você é um [termo de ódio]"*), ele é classificado primariamente como um ataque individual (Classe 3 - Misto).
+* **Ataque a Grupo**: Quando o alvo é a coletividade (ex: *"Esses [termo de ódio] não prestam"*), configura-se o discurso de ódio propriamente dito (Classe 2).
 
-Nosso dataset é perfeitamente balanceado, contendo **607 amostras** para cada uma das seguintes classes:
+## 2. Taxonomia Multi-Rótulo (4 Classes)
 
-| `ataque_grupo` | `ataque_individual` | Categoria | Descrição |
+Propomos uma matriz taxonômica que desambigua os cenários através de duas variáveis binárias: `ataque_grupo` e `ataque_individual`.
+
+| Classe | Categoria | Config. (G / I) | Descrição Teórica |
 | :--- | :--- | :--- | :--- |
-| `0` | `0` | **Neutro** | Texto não-ofensivo. |
-| `0` | `1` | **Ataque Individual** | Ofensa ou xingamento direcionado a um indivíduo. |
-| `1` | `0` | **Discurso de Ódio** | Ataque generalizado a um grupo protegido. |
-| `1` | `1` | **Misto** | Ataque individual que utiliza um termo de ódio a grupo. |
+| **0** | **Neutro** | `0 / 0` | Texto não ofensivo. Baseline para o modelo. |
+| **1** | **Ataque Individual** | `0 / 1` | Ofensa direcionada a um indivíduo sem viés de grupo. |
+| **2** | **Discurso de Ódio** | `1 / 0` | Ataque generalizado a um grupo (Abordagem Universalista). |
+| **3** | **Misto** | `1 / 1` | Ataque individual que utiliza estigmas de grupo como arma de ofensa. |
 
-## 2. Metodologia de Construção
+## 3. O Dataset
 
-Para garantir um dataset de alta qualidade e autenticidade, adotamos uma metodologia híbrida:
+O dataset consolidado possui **2.428 amostras**, rigorosamente balanceadas com 607 exemplos para cada classe.
 
-1.  **Geração Assistida por LLM:** Uso de prompts detalhados para gerar frases-base, seguido de uma **pós-edição manual intensiva** para remover vícios de IA e aumentar a verossimilhança.
-2.  **Síntese Manual (Classe Mista):** Criação manual da classe `[1,1]` através da fusão e edição coesa de amostras das classes `[1,0]` e `[0,1]`.
-3.  **Curadoria de Datasets Existentes:** Revisão linha por linha e reaproveitamento de amostras (principalmente neutras) dos datasets ToLD-BR e OLID-BR.
-4.  **Coleta "In-the-Wild":** Coleta suplementar de dados reais via API do Reddit (PRAWN) com posterior análise e classificação manual.
+### Metodologia de Construção:
+1.  **Coleta "In-the-Wild"**: Captura de dados reais do **Reddit** via API (PRAW), preservando a linguagem natural, gírias e variações gramaticais.
+2.  **Geração e Aumento de Dados**: Uso de LLMs para gerar frases que preencham lacunas teóricas (ex: ataques a maiorias), seguido de edição manual exaustiva.
+3.  **Curadoria Manual**: Revisão linha por linha por especialistas para garantir a aderência ao Princípio da Prioridade do Alvo.
+4.  **Integração**: Incorporação e reclassificação de amostras selecionadas do ToLD-BR e OLID-BR.
 
-## 3. Status do Projeto
+## 4. Estrutura do Repositório
 
--   [x] Definição da Taxonomia de 4 classes
--   [x] Coleta, Geração e Curadoria do Dataset (2.428 amostras)
--   [x] Pré-processamento (Limpeza, Remoção de Stopwords, Lematização)
--   [ ] Treinamento e Avaliação de LLMs (Em Andamento)
--   [ ] Redação do Artigo Científico (Em Andamento)
+O repositório está organizado para garantir transparência metodológica e facilitar o treinamento de modelos:
 
-## 4. Estrutura do Repositório (Provisório)
-```/│ ├── Dataset_criado/ │ ├── dataset_gerado/ │ │ ├── dataset_formatado_bruto.csv (O dataset original) │ │ └── dataset_formatado_tratado.csv (O dataset pré-processado) │ │ │ ├── olid_gerados_[0,0]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[0,1]/ (Amostras-fonte usadas para a classe) │ ├── olid_gerados_[1,0]/ (Amostras-fonte usadas para a classe) │ └── olid_gerados_[1,1]/ (Amostras-fonte usadas para a classe) │ ├── scripts/ (Scripts de coleta, processamento, etc.) └── README.md (Este arquivo)```
+```text
+/
+├── Dataset_criado/
+│   ├── Neutro/                # Amostras da classe [0,0]
+│   ├── Ataque_Individual/     # Amostras da classe [0,1]
+│   ├── Ataque_a_Grupo/        # Amostras da classe [1,0] (Discurso de Ódio)
+│   ├── Ataque_Misto/          # Amostras da classe [1,1]
+│   └── dataset_consolidado.csv # Versão final pronta para treinamento
+├── scripts/
+│   ├── coleta_reddit.py       # Script de extração via PRAW
+│   ├── tratamento.py          # Pré-processamento e limpeza
+│   └── filtro_palavras.py     # Filtragem estratégica de candidatos
+└── README.md
 
 
 ## 5. Licença e Atribuição
@@ -63,7 +80,7 @@ Se você utilizar este dataset em seu trabalho, por favor, cite nosso artigo (ai
 **Nosso Trabalho (Placeholder):**
 ```bibtex
 @misc{seu_projeto_2025,
-  author    = {[Aiko Ian], [Guilherme Leite], [Carol Medeiros], [Augusto Ferrer]},
+  author    = {[Aiko Ian], [Guilherme Leite], [Carol Medeiros]},
   title     = {[Título do seu Artigo/Dataset, ex: Um Dataset Granular para Detecção de Ódio e Ofensa em Português]},
   year      = {2025},
   publisher = {GitHub},
