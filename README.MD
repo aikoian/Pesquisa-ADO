@@ -3,7 +3,7 @@
 [![Status do Projeto](https://img.shields.io/badge/Status-Em_Andamento-blue.svg)](https://shields.io/)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/Dataset_License-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
-Este repositório documenta um projeto de extensão focado na análise e detecção de discurso de ódio nas redes sociais (com foco inicial no Reddit) para o português brasileiro, utilizando Modelos de Linguagem de Grande Porte (LLMs).
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 O principal artefato deste projeto é um **novo dataset de 2.428 amostras**, criado para permitir uma classificação mais granular de toxicidade, diferenciando ataques individuais de discurso de ódio direcionado a grupos.
 
