@@ -1,0 +1,1 @@
+Aqui colocaremos, todos os documentos, artigos e materiais que nós estudamos para construção tanto teórica como prática do dataset.
