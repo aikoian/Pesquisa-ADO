@@ -1,192 +1,262 @@
-#imports;
-import os
-import pandas as pd
-import numpy as np
-import joblib
+# ==============================================================================
+# SCRIPT DE TREINAMENTO E AVALIAÇÃO: NAIVE BAYES MULTINOMIAL
+# Projeto: Detecção de Discurso de Ódio e Linguagem Ofensiva (Pesquisa-ADO)
+# ==============================================================================
 
-from sklearn.model_selection import train_test_split 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.multioutput import MultiOutputClassifier
+# Imports das bibliotecas fundamentais de manipulação de sistema e dados
+import os           # Para verificação de existência de pastas e arquivos no sistema
+import joblib       # Para salvar e carregar os modelos treinados em disco (.pkl)
+import pandas as pd # Para leitura, manipulação e conversão das estruturas de dados (CSV/DataFrames)
+import numpy as np  # Para operações matriciais e numéricas eficientes
+
+# Imports do Scikit-Learn para Processamento de Linguagem Natural e Machine Learning
+from sklearn.model_selection import train_test_split  # Para divisão dos dados em Treino e Teste
+from sklearn.feature_extraction.text import TfidfVectorizer # Para conversão do texto em matriz numérica TF-IDF
+from sklearn.naive_bayes import MultinomialNB          # Algoritmo Naive Bayes focado em contagens/frequências textuais
+from sklearn.multioutput import MultiOutputClassifier   # Wrapper para permitir classificação multi-rótulo simultânea
+
+# Imports de métricas para avaliação detalhada da performance dos modelos
 from sklearn.metrics import (
-    classification_report,
-    confusion_matrix,
-    f1_score,
-    accuracy_score,
-    hamming_loss,
-    multilabel_confusion_matrix
+    classification_report,      # Gera Precision, Recall e F1-Score por classe
+    confusion_matrix,           # Gera a matriz de confusão (Previsto vs Real)
+    f1_score,                   # Métrica F1-Score (média harmônica de precisão e revocação)
+    accuracy_score,             # Acurácia exata da predição
+    hamming_loss                 # Perda por rótulo incorreto (métrica padrão para multi-rótulo)
 )
+
 
 def carregar_e_preparar_dados(caminho_csv):
     """
-    Carrega o dataset consolidado e estrutura as variáveis de entrada (X) 
-    e alvos (y) tanto para multi-classe (0 a 3) quanto para multi-rótulo ([G, I]).
+    Função responsável por ler o arquivo CSV e estruturar as variáveis de treino.
+    Converte as combinações binárias [ataque_grupo, ataque_individual] em rótulos de 0 a 3.
     """
+    # Verifica se o arquivo CSV realmente existe no caminho especificado
     if not os.path.exists(caminho_csv):
-        raise FileNotFoundError(f"Arquivo não encontrado em: {caminho_csv}")
+        raise FileNotFoundError(f"Arquivo de dados não encontrado em: {caminho_csv}")
 
+    # Carrega o CSV para a memória utilizando o Pandas
     df = pd.read_csv(caminho_csv)
     
-    # Validação das colunas esperadas
-    colunas_obrigatorias = {'texto', 'ataque_grupo', 'ataque_individual'}
-    if not colunas_obrigatorias.issubset(df.columns):
-        raise ValueError(f"O CSV deve conter as colunas: {colunas_obrigatorias}")
+    # Define as colunas que obrigatoriamente precisam existir na base de dados
+    colunas_necessarias = {'texto', 'ataque_grupo', 'ataque_individual'}
+    if not colunas_necessarias.issubset(df.columns):
+        raise ValueError(f"O CSV deve conter as colunas: {colunas_necessarias}")
 
-    # Remove linhas nulas no texto
+    # Remove eventuais linhas onde o texto esteja vazio/nulo e reseta os índices da tabela
     df = df.dropna(subset=['texto']).reset_index(drop=True)
 
-    # Mapeamento Multi-Classe de 4 Categorias:
-    # [0, 0] -> 0 (Neutro)
-    # [0, 1] -> 1 (Ataque Individual)
-    # [1, 0] -> 2 (Discurso de Ódio)
-    # [1, 1] -> 3 (Misto)
-    def mapear_categoria(row):
-        g, i = row['ataque_grupo'], row['ataque_individual']
-        if g == 0 and i == 0:
-            return 0
-        elif g == 0 and i == 1:
-            return 1
-        elif g == 1 and i == 0:
-            return 2
-        elif g == 1 and i == 1:
-            return 3
+    # Mapeamento da Matriz Taxonômica de 4 Classes (Multi-Classe):
+    # Classe 0: Neutro               -> [ataque_grupo=0, ataque_individual=0]
+    # Classe 1: Ataque Individual    -> [ataque_grupo=0, ataque_individual=1]
+    # Classe 2: Discurso de Ódio     -> [ataque_grupo=1, ataque_individual=0]
+    # Classe 3: Misto                -> [ataque_grupo=1, ataque_individual=1]
+    def definir_classe_num(linha):
+        grupo = linha['ataque_grupo']
+        indiv = linha['ataque_individual']
+        
+        if grupo == 0 and indiv == 0:
+            return 0  # Neutro [0,0]
+        elif grupo == 0 and indiv == 1:
+            return 1  # Ataque Individual [0,1]
+        elif grupo == 1 and indiv == 0:
+            return 2  # Discurso de Ódio [1,0]
+        elif grupo == 1 and indiv == 1:
+            return 3  # Misto [1,1]
         return 0
 
-    df['classe_4cat'] = df.apply(mapear_categoria, axis=1)
+    # Aplica a função de mapeamento linha por linha criando uma nova coluna chamada 'classe_4cat'
+    df['classe_4cat'] = df.apply(definir_classe_num, axis=1)
 
-    X = df['texto']
-    y_multirotulo = df[['ataque_grupo', 'ataque_individual']].values
-    y_multiclasse = df['classe_4cat'].values
+    # Separação dos Vetores de Entrada (X) e dos Rótulos Alvo (Y)
+    X = df['texto']                                                      # O texto puro da frase
+    Y_multirotulo = df[['ataque_grupo', 'ataque_individual']].values    # Matriz com 2 colunas binárias [G, I]
+    y_multiclasse = df['classe_4cat'].values                             # Vetor simples com valores 0, 1, 2 ou 3
 
-    return X, y_multirotulo, y_multiclasse
+    return X, Y_multirotulo, y_multiclasse
 
 
-def treinar_e_avaliar_naive_bayes(caminho_dataset):
-    # 1. Carregamento dos Dados
-    X, Y_multi, y_cat = carregar_e_preparar_dados(caminho_dataset)
+def treinar_e_avaliar_pipeline(caminho_csv):
+    """
+    Função principal de treinamento: lê os dados, vetoriza, treina dois modelos Naive Bayes
+    (Multi-Classe e Multi-Rótulo) e exibe o relatório analítico no console.
+    """
+    print(f"-> Carregando dataset a partir de: {caminho_csv}\n")
+    X, Y_multi, y_cat = carregar_e_preparar_dados(caminho_csv)
 
-    # 2. Divisão Treino/Teste (80/20) Estratificada pela classe de 4 categorias
-    X_train, X_test, y_cat_train, y_cat_test, Y_multi_train, Y_multi_test = train_test_split(
+    # Divisão de Dados em Treino (80%) e Teste (20%)
+    # stratify=y_cat garante que a proporção exata de cada uma das 4 classes seja mantida no treino e teste
+    X_treino, X_teste, y_cat_treino, y_cat_teste, Y_multi_treino, Y_multi_teste = train_test_split(
         X, y_cat, Y_multi,
-        test_size=0.20,
-        random_state=42,
-        stratify=y_cat
+        test_size=0.20,      # 20% das amostras reservadas para teste
+        random_state=42,     # Semente fixa para garantir reprodutibilidade nos experimentos
+        stratify=y_cat       # Mantém o balanço original das classes em ambas as divisões
     )
 
-    print(f"=== ESTATÍSTICAS DA DIVISÃO ===")
-    print(f"Total de amostras de Treino: {len(X_train)}")
-    print(f"Total de amostras de Teste:  {len(X_test)}\n")
-
-    # 3. Vetorização TF-IDF (Unigramas e Bigramas com suporte a stop-words em Português)
-    vectorizer = TfidfVectorizer(
-        ngram_range=(1, 2),
-        sublinear_tf=True,
-        min_df=2,
-        max_df=0.90
-    )
-
-    X_train_tfidf = vectorizer.fit_transform(X_train)
-    X_test_tfidf = vectorizer.transform(X_test)
-
-    # =========================================================================
-    # ABORDAGEM A: MODELO MULTI-CLASSE (4 CLASSES DIRETAS)
-    # =========================================================================
-    print("=" * 60)
-    print("  ABORDAGEM 1: NAIVE BAYES MULTI-CLASSE (4 CATEGORIAS)")
-    print("=" * 60)
-
-    # MultinomialNB com Suavização de Laplace (alpha=0.1 ou 1.0)
-    model_multiclass = MultinomialNB(alpha=0.5)
-    model_multiclass.fit(X_train_tfidf, y_cat_train)
-
-    y_cat_pred = model_multiclass.predict(X_test_tfidf)
-
-    nomes_classes = ['Neutro [0,0]', 'Ataque Ind. [0,1]', 'Discurso Ódio [1,0]', 'Misto [1,1]']
+    print("==========================================================")
+    print(" 1. VETORIZAÇÃO DE TEXTO (TF-IDF)")
+    print("==========================================================")
     
-    print("\n--- Relatório de Classificação (4 Classes) ---")
-    print(classification_report(y_cat_test, y_cat_pred, target_names=nomes_classes, digits=4))
+    # Configuração do Vetorizador TF-IDF (Term Frequency - Inverse Document Frequency)
+    # Convertemos o texto para uma matriz de relevância numérica de termos.
+    vetorizador = TfidfVectorizer(
+        ngram_range=(1, 2), # Considera palavras isoladas (unigramas) e pares de palavras (bigramas)
+        sublinear_tf=True,  # Aplica escala logarítmica (1 + log(tf)) para amenizar o peso de palavras repetitivas
+        min_df=2,           # Descarta termos que apareçam em menos de 2 documentos (reduz ruído)
+        max_df=0.90         # Descarta termos que apareçam em mais de 90% dos documentos (palavras genéricas demais)
+    )
 
+    # Ajusta o dicionário com o texto de treino e transforma o treino em matriz numérica
+    X_treino_tfidf = vetorizador.fit_transform(X_treino)
+    
+    # Apenas transforma o texto de teste usando o dicionário já aprendido no treino (evita vazamento de dados)
+    X_teste_tfidf = vetorizador.transform(X_teste)
+
+    print(f"Tamanho do Vocabulário aprendido pelo TF-IDF: {len(vetorizador.get_feature_names_out())} termos.\n")
+
+    # =========================================================================
+    # MODELO 1: CLASSFICADOR NAIVE BAYES MULTI-CLASSE (4 CATEGORIAS)
+    # =========================================================================
+    print("==========================================================")
+    print(" 2. MODELO MULTI-CLASSE DIRETAS (4 CATEGORIAS: 0, 1, 2, 3)")
+    print("==========================================================")
+
+    # Instancia o Naive Bayes Multinomial com Suavização de Laplace (alpha=0.5)
+    modelo_multiclasse = MultinomialNB(alpha=0.5)
+    
+    # Treina o modelo associando a matriz TF-IDF de treino com as categorias numéricas (0, 1, 2, 3)
+    modelo_multiclasse.fit(X_treino_tfidf, y_cat_treino)
+
+    # Realiza a predição para os dados de teste que o modelo nunca viu
+    y_pred_cat = modelo_multiclasse.predict(X_teste_tfidf)
+
+    # Nomes legíveis das categorias para impressão no relatório
+    nomes_rotulos = ['Neutro [0,0]', 'Ataque Ind. [0,1]', 'Discurso Ódio [1,0]', 'Misto [1,1]']
+
+    # Relatório de Métricas Detalhadas (Precision, Recall, F1-Score por classe)
+    print("\n--- Relatório de Desempenho (Multi-Classe) ---")
+    print(classification_report(y_cat_teste, y_pred_cat, target_names=nomes_rotulos, digits=4))
+
+    # Matriz de Confusão para identificar onde o modelo está errando/confundindo as classes
     print("--- Matriz de Confusão ---")
-    cm = confusion_matrix(y_cat_test, y_cat_pred)
-    cm_df = pd.DataFrame(cm, index=nomes_classes, columns=nomes_classes)
-    print(cm_df)
+    matriz_cm = confusion_matrix(y_cat_teste, y_pred_cat)
+    matriz_df = pd.DataFrame(matriz_cm, index=nomes_rotulos, columns=nomes_rotulos)
+    print(matriz_df)
     print("\n")
 
     # =========================================================================
-    # ABORDAGEM B: MODELO MULTI-RÓTULO (BINARY RELEVANCE)
+    # MODELO 2: CLASSIFICADOR NAIVE BAYES MULTI-RÓTULO (BINARY RELEVANCE)
     # =========================================================================
-    print("=" * 60)
-    print("  ABORDAGEM 2: NAIVE BAYES MULTI-RÓTULO (BINARY RELEVANCE)")
-    print("=" * 60)
+    print("==========================================================")
+    print(" 3. MODELO MULTI-RÓTULO (CLASSIFICAÇÃO BINÁRIA INDEPENDENTE)")
+    print("==========================================================")
 
-    model_multilabel = MultiOutputClassifier(MultinomialNB(alpha=0.5))
-    model_multilabel.fit(X_train_tfidf, Y_multi_train)
-
-    Y_multi_pred = model_multilabel.predict(X_test_tfidf)
-
-    # Métricas de Multi-Rótulo
-    h_loss = hamming_loss(Y_multi_test, Y_multi_pred)
-    subset_acc = accuracy_score(Y_multi_test, Y_multi_pred)
-    f1_macro = f1_score(Y_multi_test, Y_multi_pred, average='macro')
-    f1_micro = f1_score(Y_multi_test, Y_multi_pred, average='micro')
-
-    print(f"\nHamming Loss (menor é melhor): {h_loss:.4f}")
-    print(f"Exact Match Ratio / Subset Accuracy: {subset_acc * 100:.2f}%")
-    print(f"F1-Score Macro: {f1_macro:.4f}")
-    print(f"F1-Score Micro: {f1_micro:.4f}\n")
-
-    print("--- Detalhamento por Rótulo Binário ---")
-    print("1. Rótulo 'ataque_grupo':")
-    print(classification_report(Y_multi_test[:, 0], Y_multi_pred[:, 0], digits=4))
-
-    print("2. Rótulo 'ataque_individual':")
-    print(classification_report(Y_multi_test[:, 1], Y_multi_pred[:, 1], digits=4))
-
-    # =========================================================================
-    # SALVANDO ARTEFATOS DO MODELO
-    # =========================================================================
-    os.makedirs("modelos_salvos", exist_ok=True)
-    joblib.dump(vectorizer, "modelos_salvos/tfidf_vectorizer.pkl")
-    joblib.dump(model_multiclass, "modelos_salvos/naive_bayes_multiclasse.pkl")
-    joblib.dump(model_multilabel, "modelos_salvos/naive_bayes_multirotulo.pkl")
-    print("Modelos e Vetorizador salvos em 'modelos_salvos/' com sucesso!")
-
-    return vectorizer, model_multiclass
-
-
-def predizer_novo_texto(texto, vectorizer, model_multiclass):
-    """
-    Função utilitária para testar o modelo treinado em frases inéditas.
-    """
-    m_classes = {0: "Neutro [0,0]", 1: "Ataque Individual [0,1]", 2: "Discurso de Ódio [1,0]", 3: "Misto [1,1]"}
-    vetor = vectorizer.transform([texto])
-    pred = model_multiclass.predict(vetor)[0]
-    probas = model_multiclass.predict_proba(vetor)[0]
+    # O MultiOutputClassifier cria 2 instâncias do Naive Bayes em paralelo:
+    # Um modelo dedicado unicamente a prever 'ataque_grupo' (0 ou 1)
+    # Um modelo dedicado unicamente a prever 'ataque_individual' (0 ou 1)
+    modelo_multirotulo = MultiOutputClassifier(MultinomialNB(alpha=0.5))
     
-    print(f"\nTexto: '{texto}'")
-    print(f"Predição: {m_classes[pred]}")
+    # Treina os dois modelos binários simultaneamente
+    modelo_multirotulo.fit(X_treino_tfidf, Y_multi_treino)
+
+    # Realiza a predição da matriz de teste com 2 colunas
+    Y_pred_multi = modelo_multirotulo.predict(X_teste_tfidf)
+
+    # Cálculo de métricas específicas para problemas multi-rótulo
+    perda_hamming = hamming_loss(Y_multi_teste, Y_pred_multi)            # Fração de rótulos incorretos
+    acuracia_exata = accuracy_score(Y_multi_teste, Y_pred_multi)        # Porcentagem de acerto de AMBOS os rótulos ao mesmo tempo
+    f1_macro = f1_score(Y_multi_teste, Y_pred_multi, average='macro')   # F1-Score considerando o peso igual das classes
+
+    print(f"Hamming Loss (quanto menor, melhor): {perda_hamming:.4f}")
+    print(f"Acurácia Exata do Par (Subset Accuracy): {acuracia_exata * 100:.2f}%")
+    print(f"F1-Score Macro: {f1_macro:.4f}\n")
+
+    # =========================================================================
+    # SALVAMENTO DOS MODELOS E ARTEFATOS
+    # =========================================================================
+    pasta_destino = "modelos_salvos"
+    os.makedirs(pasta_destino, exist_ok=True) # Cria a pasta se ela não existir
+    
+    # Salva o vetorizador e os dois modelos treinados em arquivos compactos .pkl
+    joblib.dump(vetorizador, os.path.join(pasta_destino, "vetorizador_tfidf.pkl"))
+    joblib.dump(modelo_multiclasse, os.path.join(pasta_destino, "naive_bayes_multiclasse.pkl"))
+    joblib.dump(modelo_multirotulo, os.path.join(pasta_destino, "naive_bayes_multirotulo.pkl"))
+    
+    print(f"-> Modelos e vetorizador salvos com sucesso na pasta '{pasta_destino}/'!")
+
+    return vetorizador, modelo_multiclasse
+
+
+def testar_frase_individual(texto, vetorizador, modelo_multiclasse):
+    """
+    Função auxiliar para você testar frases avulsas diretamente no terminal.
+    """
+    mapa_categorias = {
+        0: "Neutro [0,0]",
+        1: "Ataque Individual [0,1]",
+        2: "Discurso de Ódio [1,0]",
+        3: "Misto [1,1]"
+    }
+    
+    # Transforma o texto simples recebido no formato matricial TF-IDF
+    vetor_texto = vetorizador.transform([texto])
+    
+    # Realiza a predição da classe (0, 1, 2 ou 3)
+    classe_prevista = modelo_multiclasse.predict(vetor_texto)[0]
+    
+    # Extrai as probabilidades estimadas pelo Naive Bayes para cada uma das 4 classes
+    probabilidades = modelo_multiclasse.predict_proba(vetor_texto)[0]
+    
+    print(f"\nEntrada: \"{texto}\"")
+    print(f"Predição do Modelo: {mapa_categorias[classe_prevista]}")
     print("Probabilidades por Classe:")
-    for idx, prob in enumerate(probas):
-        print(f"  - {m_classes[idx]}: {prob * 100:.2f}%")
+    for idx, prob in enumerate(probabilidades):
+        print(f"  - {mapa_categorias[idx]}: {prob * 100:.2f}%")
 
 
+# ==============================================================================
+# BLOCO DE EXECUÇÃO PRINCIPAL (MAIN)
+# ==============================================================================
 if __name__ == "__main__":
-    # Ajuste o caminho de entrada de acordo com seu repositório
-    CAMINHO_DATASET = "Dataset_criado/dataset_consolidado.csv"
     
-    # Se o arquivo consolidado estiver na pasta raiz para testes locais:
-    if not os.path.exists(CAMINHO_DATASET):
-        CAMINHO_DATASET = "dataset_consolidado.csv"
-
-    # Executa treino e avaliação
-    vec, model = treinar_e_avaliar_naive_bayes(CAMINHO_DATASET)
-
-    # Exemplo prático de inferência para validação
-    print("\n" + "="*60)
-    print("  TESTE DE INFERÊNCIA EM TEMPO REAL")
-    print("="*60)
+    # Lista de caminhos prováveis onde seu CSV pode estar guardado na árvore de diretórios do projeto
+    caminhos_possiveis = [
+        "Dataset_criado/dataset_gerado/dataset_formatado_tratado.csv",
+        "Dataset_criado/dataset_gerado/dataset_formatado_bruto.csv",
+        "Dataset_criado/dataset_consolidado.csv",
+        "dataset_consolidado.csv"
+    ]
     
-    predizer_novo_texto("Acho que deveríamos estudar mais sobre inteligência artificial.", vec, model)
-    predizer_novo_texto("Você é um imbecil e não sabe do que está falando.", vec, model)
-    predizer_novo_texto("Esses policiais são todos uns porcos corruptos.", vec, model)
-    predizer_novo_texto("Seu viado de merda, sai daqui.", vec, model)
+    caminho_final = None
+    for caminho in caminhos_possiveis:
+        if os.path.exists(caminho):
+            caminho_final = caminho
+            break
+
+    if caminho_final is None:
+        print("[ERRO] Nenhum arquivo CSV do dataset foi encontrado nas pastas do projeto.")
+        print("Por favor, verifique se o arquivo .csv está na pasta 'Dataset_criado/dataset_gerado/'.")
+    else:
+        # 1. Executa o ciclo de treino e avaliação completa
+        vetorizador_treinado, modelo_treinado = treinar_e_avaliar_pipeline(caminho_final)
+
+        # 2. Testes de inferência em tempo real para validação rápida no terminal
+        print("\n" + "=" * 60)
+        print(" 4. TESTES PRÁTICOS DE INFERÊNCIA EM FRASES")
+        print("=" * 60)
+
+        testar_frase_individual(
+            "Acho que deveríamos analisar os dados com cuidado antes da reunião.", 
+            vetorizador_treinado, modelo_treinado
+        )
+        testar_frase_individual(
+            "Você é um idiota completo e não sabe fazer nada direito.", 
+            vetorizador_treinado, modelo_treinado
+        )
+        testar_frase_individual(
+            "Todos esses policiais são porcos corruptos.", 
+            vetorizador_treinado, modelo_treinado
+        )
+        testar_frase_individual(
+            "Seu viadinho de merda, cale a sua boca.", 
+            vetorizador_treinado, modelo_treinado
+        )
