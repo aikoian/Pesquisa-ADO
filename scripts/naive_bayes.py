@@ -1,3 +1,6 @@
+
+
+
 # ==============================================================================
 # SCRIPT DE TREINAMENTO E AVALIAÇÃO: NAIVE BAYES MULTINOMIAL
 # Projeto: Detecção de Discurso de Ódio e Linguagem Ofensiva (Pesquisa-ADO)
@@ -38,12 +41,12 @@ def carregar_e_preparar_dados(caminho_csv):
     df = pd.read_csv(caminho_csv)
     
     # Define as colunas que obrigatoriamente precisam existir na base de dados
-    colunas_necessarias = {'texto', 'ataque_grupo', 'ataque_individual'}
+    colunas_necessarias = {'text', 'ataque_grupo', 'ataque_individual'}
     if not colunas_necessarias.issubset(df.columns):
         raise ValueError(f"O CSV deve conter as colunas: {colunas_necessarias}")
 
     # Remove eventuais linhas onde o texto esteja vazio/nulo e reseta os índices da tabela
-    df = df.dropna(subset=['texto']).reset_index(drop=True)
+    df = df.dropna(subset=['text']).reset_index(drop=True)
 
     # Mapeamento da Matriz Taxonômica de 4 Classes (Multi-Classe):
     # Classe 0: Neutro               -> [ataque_grupo=0, ataque_individual=0]
@@ -68,7 +71,7 @@ def carregar_e_preparar_dados(caminho_csv):
     df['classe_4cat'] = df.apply(definir_classe_num, axis=1)
 
     # Separação dos Vetores de Entrada (X) e dos Rótulos Alvo (Y)
-    X = df['texto']                                                      # O texto puro da frase
+    X = df['text']                                                      # O texto puro da frase
     Y_multirotulo = df[['ataque_grupo', 'ataque_individual']].values    # Matriz com 2 colunas binárias [G, I]
     y_multiclasse = df['classe_4cat'].values                             # Vetor simples com valores 0, 1, 2 ou 3
 
@@ -85,6 +88,7 @@ def treinar_e_avaliar_pipeline(caminho_csv):
 
     # Divisão de Dados em Treino (80%) e Teste (20%)
     # stratify=y_cat garante que a proporção exata de cada uma das 4 classes seja mantida no treino e teste
+    
     X_treino, X_teste, y_cat_treino, y_cat_teste, Y_multi_treino, Y_multi_teste = train_test_split(
         X, y_cat, Y_multi,
         test_size=0.20,      # 20% das amostras reservadas para teste
